@@ -51,11 +51,28 @@ class Table extends Component {
 						<h1>COVID-19 Table</h1>
 					</header>
 					
-					{items.map(items =>            
-						<li key={items.Country}>
-							{items.Country}
-						</li>
-					)}
+					<table style={{border: "1px solid white"}}>
+						<tr>
+							<th>Country</th>
+							<th>New Confirmed</th> 
+							<th>Total Confirmed</th>
+							<th>New Deaths</th>
+							<th>Total Deaths</th>
+							<th>New Recovered</th>
+							<th>Total Recovered</th>
+						</tr>
+						{items.map(items =>        
+								<tr>
+									<td>{items.Country}</td>
+									<td>{items.NewConfirmed}</td>
+									<td>{items.TotalConfirmed}</td>
+									<td>{items.NewDeaths}</td>
+									<td>{items.TotalDeaths}</td>
+									<td>{items.NewRecovered}</td>
+									<td>{items.TotalRecovered}</td>
+								</tr>
+						)}
+					</table>
 				</div>
 			);
 		}
