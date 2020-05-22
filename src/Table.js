@@ -4,6 +4,12 @@ cd desktop/coding/coronatable
 
 npm start
 
+git add .
+
+git commit
+
+git push origin master
+
 */
 
 import React, { Component } from 'react'
@@ -11,7 +17,6 @@ import './App.css';
 
 const API = 'https://api.covid19api.com/';
 const DEFAULT_QUERY = 'summary';
-var errorResolved = false;
 
 class Table extends Component {
   constructor(props) {
@@ -20,79 +25,56 @@ class Table extends Component {
     this.state = {
       error: null,
       isLoaded: false,
-      items: []
+      items: [],
+	  curCol: 0,
     };
   }
-  sortTable(n){
-  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-  table = document.getElementById("coronatable");
-  switching = true;
-  // Set the sorting direction to ascending:
-  dir = "asc";
-  /* Make a loop that will continue until
-  no switching has been done: */
-  while (switching) {
-    // Start by saying: no switching is done:
-    switching = false;
-    rows = table.rows;
-    /* Loop through all table rows (except the
-    first, which contains table headers): */
-    for (i = 1; i < (rows.length - 1); i++) {
-      // Start by saying there should be no switching:
-      shouldSwitch = false;
-      /* Get the two elements you want to compare,
-      one from current row and one from the next: */
-      x = rows[i].getElementsByTagName("TD")[n];
-      y = rows[i + 1].getElementsByTagName("TD")[n];
-      /* Check if the two rows should switch place,
-      based on the direction, asc or desc: */
-	  if(n==0){
-		  if (dir == "asc") {
-			if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-			  // If so, mark as a switch and break the loop:
-			  shouldSwitch = true;
-			  break;
-			}
-		  } else if (dir == "desc") {
-			if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-			  // If so, mark as a switch and break the loop:
-			  shouldSwitch = true;
-			  break;
-			}
-		  }
+  compare(n,first,second){
+		var table = document.getElementById("coronatable");
+		var rows = table.rows;
+		var prevRow = rows[first].getElementsByTagName("TD")[n];
+		var curRow = rows[second].getElementsByTagName("TD")[n];
+		var x,y;
+		if(n == 0){
+			x = prevRow.innerHTML.localeCompare(curRow.innerHTML);
+			y = 0;
 		}
-	  else{
-		  if (dir == "asc") {
-			if (Number(x.innerHTML) > Number(y.innerHTML)) {
-			  // If so, mark as a switch and break the loop:
-			  shouldSwitch = true;
-			  break;
-			}
-		  } else if (dir == "desc") {
-			if (Number(x.innerHTML) < Number(y.innerHTML)) {
-			  // If so, mark as a switch and break the loop:
-			  shouldSwitch = true;
-			  break;
-			}
-		  }
+		else{
+			x = Number(prevRow.innerHTML);
+			y = Number(curRow.innerHTML);
+		}
+		return x<y;
+	}
+  sortTable(n,start,end){
+	if(end==start)return;
+	var i;
+	var table = document.getElementById("coronatable");
+	var rows = table.rows;
+	var newStart = Number(start);
+	var sorted = true;
+	for(i = start+1;i<end;i++){
+		if(this.compare(n,i-1,i)){
+			sorted = false;
+			break;
 		}
 	}
-    if (shouldSwitch) {
-      /* If a switch has been marked, make the switch
-      and mark that a switch has been done: */
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      switching = true;
-      // Each time a switch is done, increase this count by 1:
-      switchcount ++;
-    } else {
-      /* If no switching has been done AND the direction is "asc",
-      set the direction to "desc" and run the while loop again. */
-      if (switchcount == 0 && dir == "asc") {
-        dir = "desc";
-        switching = true;
-      }
-    }
-  }
+	if(sorted){
+		if(start==1 && end==table.rows.length){
+			for(i=2;i<table.rows.length;i++){
+				rows[1].parentNode.insertBefore(rows[i], rows[1]);
+			}
+		}
+		return;
+	}
+	for (i = start+1;i < end;i++){
+		if(this.compare(n,newStart,i)){
+			rows[start].parentNode.insertBefore(rows[i], rows[start]);
+			newStart++;
+		}
+	}
+	console.log(newStart,start,end);
+	this.sortTable(n,start,newStart);
+	this.sortTable(n,newStart+1,end);
   }
   
  fetchApi(){
@@ -100,7 +82,6 @@ class Table extends Component {
 	.then(res => res.json())
 	.then(
 		(result) => {
-		  errorResolved=true;
 		  this.setState({
 			isLoaded: true,
 			items: result.Countries
@@ -130,13 +111,13 @@ class Table extends Component {
 					
 					<table style={{border: "1px solid white"}} id="coronatable">
 						<tr>
-							<th onClick={()=>this.sortTable(0)}>Country</th>
-							<th onClick={()=>this.sortTable(1)}>New Confirmed</th> 
-							<th onClick={()=>this.sortTable(2)}>Total Confirmed</th>
-							<th onClick={()=>this.sortTable(3)}>New Deaths</th>
-							<th onClick={()=>this.sortTable(4)}>Total Deaths</th>
-							<th onClick={()=>this.sortTable(5)}>New Recovered</th>
-							<th onClick={()=>this.sortTable(6)}>Total Recovered</th>
+							<th onClick={()=>this.sortTable(0,1,document.getElementById("coronatable").rows.length)}>Country</th>
+							<th onClick={()=>this.sortTable(1,1,document.getElementById("coronatable").rows.length)}>New Confirmed</th> 
+							<th onClick={()=>this.sortTable(2,1,document.getElementById("coronatable").rows.length)}>Total Confirmed</th>
+							<th onClick={()=>this.sortTable(3,1,document.getElementById("coronatable").rows.length)}>New Deaths</th>
+							<th onClick={()=>this.sortTable(4,1,document.getElementById("coronatable").rows.length)}>Total Deaths</th>
+							<th onClick={()=>this.sortTable(5,1,document.getElementById("coronatable").rows.length)}>New Recovered</th>
+							<th onClick={()=>this.sortTable(6,1,document.getElementById("coronatable").rows.length)}>Total Recovered</th>
 						</tr>
 						{items.map(items =>        
 								<tr>
