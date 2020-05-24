@@ -27,6 +27,7 @@ class Table extends Component {
       isLoaded: false,
       items: [],
 	  curCol: 0,
+	  sortBy: 0, //0=ascending
     };
   }
   compare(n,first,second){
@@ -52,6 +53,13 @@ class Table extends Component {
 	var rows = table.rows;
 	var newStart = Number(start);
 	var sorted = true;
+	
+	if(start==2 && end==table.rows.length){
+		this.setState({
+			curCol: n,
+			sortBy: 1,
+		});
+	}
 	for(i = start+1;i<end;i++){
 		if(this.compare(n,i-1,i)){
 			sorted = false;
@@ -59,11 +67,15 @@ class Table extends Component {
 		}
 	}
 	if(sorted){
-		if(start==1 && end==table.rows.length){
-			for(i=2;i<table.rows.length;i++){
-				rows[1].parentNode.insertBefore(rows[i], rows[1]);
+		if(start==2 && end==table.rows.length){
+			for(i=3;i<table.rows.length;i++){
+				rows[2].parentNode.insertBefore(rows[i], rows[2]);
 			}
+			this.setState({
+				sortBy: 1-this.state.sortBy,
+			});
 		}
+		
 		return;
 	}
 	for (i = start+1;i < end;i++){
@@ -98,7 +110,17 @@ class Table extends Component {
   componentDidMount() {
 	  this.fetchApi();
   }
-  
+  arrow(n){
+	  if(this.state.curCol == n){
+		  if(this.state.sortBy == 1)
+			  return "▼";
+		  else
+			  return "▲";
+	  }
+  }
+  dateParse(str){
+	  return str.substring(0,10)+" "+str.substring(12,19)+" GMT";
+  }
 	render() {
 		const { error, isLoaded, items } = this.state;
 		if (error) {
@@ -108,19 +130,28 @@ class Table extends Component {
 		} else {
 			return (
 				<div>
-					
+				Last updated: {this.dateParse(items[0].Date)}
 					<table style={{border: "1px solid white"}} id="coronatable">
 						<tr>
-							<th onClick={()=>this.sortTable(0,1,document.getElementById("coronatable").rows.length)}>Country</th>
-							<th onClick={()=>this.sortTable(1,1,document.getElementById("coronatable").rows.length)}>New Confirmed</th> 
-							<th onClick={()=>this.sortTable(2,1,document.getElementById("coronatable").rows.length)}>Total Confirmed</th>
-							<th onClick={()=>this.sortTable(3,1,document.getElementById("coronatable").rows.length)}>New Deaths</th>
-							<th onClick={()=>this.sortTable(4,1,document.getElementById("coronatable").rows.length)}>Total Deaths</th>
-							<th onClick={()=>this.sortTable(5,1,document.getElementById("coronatable").rows.length)}>New Recovered</th>
-							<th onClick={()=>this.sortTable(6,1,document.getElementById("coronatable").rows.length)}>Total Recovered</th>
+							<th class="sortheader" onClick={()=>this.sortTable(0,2,document.getElementById("coronatable").rows.length)}>Country</th>
+							<th class="sortheader" onClick={()=>this.sortTable(1,2,document.getElementById("coronatable").rows.length)}>New Confirmed</th>
+							<th class="sortheader" onClick={()=>this.sortTable(2,2,document.getElementById("coronatable").rows.length)}>Total Confirmed</th>
+							<th class="sortheader" onClick={()=>this.sortTable(3,2,document.getElementById("coronatable").rows.length)}>New Deaths</th>
+							<th class="sortheader" onClick={()=>this.sortTable(4,2,document.getElementById("coronatable").rows.length)}>Total Deaths</th>
+							<th class="sortheader" onClick={()=>this.sortTable(5,2,document.getElementById("coronatable").rows.length)}>New Recovered</th>
+							<th class="sortheader" onClick={()=>this.sortTable(6,2,document.getElementById("coronatable").rows.length)}>Total Recovered</th>
+						</tr>
+						<tr>
+							<th class="sortheader" onClick={()=>this.sortTable(0,2,document.getElementById("coronatable").rows.length)}>{this.arrow(0)}</th>
+							<th class="sortheader" onClick={()=>this.sortTable(1,2,document.getElementById("coronatable").rows.length)}>{this.arrow(1)}</th>
+							<th class="sortheader" onClick={()=>this.sortTable(2,2,document.getElementById("coronatable").rows.length)}>{this.arrow(2)}</th>
+							<th class="sortheader" onClick={()=>this.sortTable(3,2,document.getElementById("coronatable").rows.length)}>{this.arrow(3)}</th>
+							<th class="sortheader" onClick={()=>this.sortTable(4,2,document.getElementById("coronatable").rows.length)}>{this.arrow(4)}</th>
+							<th class="sortheader" onClick={()=>this.sortTable(5,2,document.getElementById("coronatable").rows.length)}>{this.arrow(5)}</th>
+							<th class="sortheader" onClick={()=>this.sortTable(6,2,document.getElementById("coronatable").rows.length)}>{this.arrow(6)}</th>
 						</tr>
 						{items.map(items =>        
-								<tr>
+								<tr class="sortrow">
 									<td>{items.Country}</td>
 									<td>{items.NewConfirmed}</td>
 									<td>{items.TotalConfirmed}</td>

@@ -32,48 +32,22 @@ body{
   
 	
 }
-.square {
-  background: #fff;
-  border: 1px solid #0;
-  font-size: 16px;
-  line-height: 34px;
-  height: 64px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
-  width: 128px;
+
+table td, table th {
+  border: 1px solid white;
 }
-#hori-box{
-	display:flex;
-	flex-direction:row;
-	align-items: center;
-	justify-content: center;
+
+.sortheader {
+	cursor: pointer;
+	border: 1px solid black;
+	border-right: 1px solid white;
+	border-left: 1px solid white;
 }
-canvas{
-	-webkit-tap-highlight-color: transparent;
+.sortrow:hover{
+	background-color: gray;
 }
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
-}
-.App-link {
-  color: #61dafb;
-}
-#canvas-container{
-	height:525px;
-}
-#row-box {
-	flex: auto;
-	justify-content: space-between;
-}
-small {
-  font-size: 0.6em;
-}
-.App-art{
-	height: 510px;
-	width: 350px;
+tr,th{
+	height: 30px;
 }
 @keyframes App-logo-spin {
   from {
