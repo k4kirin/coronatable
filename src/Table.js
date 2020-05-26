@@ -124,7 +124,8 @@ class Table extends Component {
 	render() {
 		const { error, isLoaded, items } = this.state;
 		if (error) {
-			return <div>Error: {error.message}</div>;
+			window.location.reload()
+			return <div>Reloading. Error: {error.message}</div>;
 		} else if (!isLoaded) {
 			return <div>Loading...</div>;
 		} else {
